@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>Chain of Responsibility design pattern</title>
+
+		<meta name="description" content="A framework for easily creating beautiful presentations using HTML">
+		<meta name="author" content="Hakim El Hattab">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/black.css" id="theme">
+
+		<!-- Code syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+				<section>
+					<h1>Chain of Responsibility</h1>
+					<h3>the Design Pattern</h3>
+				</section>
+
+				<section>
+					<h3>Somewhat relevant image I found</h3>
+					<img src="http://www.sclaa.com.au/Portals/0/images/victoria/11-07-05%20Chain%20of%20Responsibility.jpg" />
+				</section>
+
+				<section>
+					<h2>Definition</h2>
+					<p>
+						<blockquote>
+							"the chain-of-responsibility pattern is a design pattern consisting of a source of <u>command objects</u> and a series of <u>processing objects</u>.  Each processing object contains logic that defines the types of command objects that it can handle; the rest are passed to the next processing object in the chain."
+						</blockquote>
+						-- wikipedia
+					</p>
+				</section>
+
+				<section>
+					<h2>What are command objects?</h2>
+					<p>
+						A command object is a different kind of design pattern.  Essentially it is a payload or piece of input data that will be passed around in the Chain of Responsibility pattern.
+					</p>
+					<br />
+					<h2>What are processing objects?</h2>
+					<p>
+						A processing object is an object that takes in the command object, and does something with it.  In the context of this pattern, the processing object is analogous link in the "chain"
+					</p>
+				</section>
+
+				<section>
+					<h2>What is the purpose of this pattern?</h2>
+					<p>
+						The purpose is to
+						<blockquote>
+							"Avoid coupling the sender of a request to its receiver by giving more than one object a chance to handle the request. Chain the receiving objects and pass the request along the chain until an object handles it."
+						</blockquote>
+						-- some website
+					</p>
+				</section>
+
+				<section>
+					<h2>What does that mean?</h2>
+					<p>
+						Essentially it means that we may not know which processing objects are supposed to handle a particular command object up front.  Using this pattern, we can throw the command object at the list of processing objects and let them figure out what they want to do with them.
+					</p>
+				</section>
+
+				<section class="stack">
+					<section>
+						<h2>Can you show me a picture?</h2>
+						<p>
+							<img src="http://sourcemaking.com/files/v2/content/patterns/Chain_of_responsibility_1-2x.png" height="450" />
+						</p>
+						<p>
+							Here, the "Request" is the command object.
+						</p>
+					</section>
+					<section>
+						<p>
+							<img src="http://sourcemaking.com/files/v2/content/patterns/Chain_of_responsibility_1-2x.png" />
+						</p>
+					</section>
+
+				</section>
+
+				<section>
+					<h2>How about an example?</h2>
+					<p>
+						Let's say we have a file that has some data in it.  We're not sure exactly what kind of data, but we need to parse it into some normalized schema.  We have a few different kinds of parsers at our disposal:
+						<ul>
+							<li>Tab-delimited parser</li>
+							<li>CSV parser</li>
+							<li>XML parser</li>
+							<li>JSON parser</li>
+						</ul>
+					</p>
+				</section>
+
+				<section>
+					<h2>How do we use the Chain pattern here?</h2>
+					<p>
+						The file, in this case, is our payload or command object, and the parsers are our processing objects.
+
+						We need to pick a starting processing object, and then link each processing object to the next one in the chain that we want to go down.
+					</p>
+				</section>
+
+				<section>
+					<h2>Pseudo code</h2>
+					<pre>
+						<code class="hljs javascript">
+// uploaded file; we don't know what kind of data is inside
+var file = request.getUploadedFile();
+
+// our first processor; assuming each parser has a common interface or signature
+var processor1 = new ProcessingObject(utility.tabParser);
+
+// while instantiating the next processor, we assign it as the "nextProcess" of the previous
+var processor2 = processor1.nextProcessor = new ProcessingObject(utility.CsvParser);
+var processor3 = processor2.nextProcessor = new ProcessingObject(utility.XmlParser);
+var processor4 = processor3.nextProcessor = new ProcessingObject(utility.JsonParser);
+
+// start the chain at processor1, and get a response
+var response = processor1.process(file);
+						</code>
+					</pre>
+				</section>
+
+				<section>
+					<h2>What happens in this code?</h2>
+					<p>
+						<ol>
+							<li>We setup the chain, and link together all the processing objects.</li>
+							<li>Then we start the chain, passing in the file.</li>
+							<li>It runs through the code in the first processor (CsvParser)
+								<ol>
+									<li>if CsvParser determines it can process the file, it does so and returns a response.</li>
+									<li>If not, it sends the file to the nextProcessor, and continues down the chain.</li>
+								</ol>
+							</li>
+						</ol>
+					</p>
+				</section>
+
+				<section>
+					<h2>Okay, why not just create an array of parsers and loop through them?</h2>
+					<p>It's mostly about decoupling code</p>
+					<ul>
+						<li>You may want to decouple the starting code from the processing objects as much as possible</li>
+						<li>You may want to give control of continuing the chain up to the processing objects</li>
+						<li>The code starting the chain may not know about all of the parsers; might be a single entry point to a third party assembly implementing the pattern.</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>Other examples: ASP.Net OWIN or Node middleware</h2>
+					<p>These are variations of the Chain of Responsibility pattern that take in HTTP requests (aka command objects).  Some of the Chain of Responsibility code happens behind the scenes (like code the start the chain, or link processing objects).  Also, in both of these examples, the command object commonly is processed by multiple processing objects.</p>
+				</section>
+
+				<section>
+					<h2>Node middleware</h2>
+					<p>Many Node frameworks, including Express, use middleware to handle requests.  Middleware here is essentially a method that takes three parameters:
+						<dl>
+							<dt>req</dt>
+							<dd>HTTP Request object (includes querystring, POST params, etc.)</dd>
+							<dt>res</dt>
+							<dd>HTTP Response object (initially blank, but will contain respons status code, response HTML, etc.)</dd>
+							<dt>next</dt>
+							<dd>A method that lets the middleware method continue to the next middleware method</dd>
+						</dl>
+					</p>
+				</section>
+
+				<section>
+					<h2>Node example</h2>
+					<pre>
+						<code class="hljs javascript">
+app.use(function (req, res, next) {
+  if (!req.query.pageId) {
+    res.status(404); //missing querystring; trigger 404
+  } else {
+    next();          //everything's fine; carry on
+  }
+});
+						</code>
+					</pre>
+				</section>
+
+				<section>
+					<h2>How is this using CoR?</h2>
+					<pre>
+						<code class="hljs javascript">
+app.use(function (req, res, next) {
+  if (!req.query.pageId) {
+    res.status(404); //missing querystring; trigger 404
+  } else {
+    next();          //everything's fine; carry on
+  }
+});
+						</code>
+					</pre>					
+					<p>
+						In this case, the <u>req</u> parameter is the command object or payload.  The <u>res</u> parameter could be considered part of the command object, but it's added as a separate parameter for clarity.  The <u>next</u> parameter fulfills the same purpose that the nextProcessor property did in our Parser example.
+					</p>
+				</section>
+				<section>
+					<h2>continued</h2>
+					<pre>
+						<code class="hljs javascript">
+app.use(function (req, res, next) {
+  if (!req.query.pageId) {
+    res.status(404); //missing querystring; trigger 404
+  } else {
+    next();          //everything's fine; carry on
+  }
+});
+						</code>
+					</pre>
+					<p>
+						The idea here is that if the request is missing a querystring parameter, we should return a 404 status request, and NOT continue down the chain.  If the parameter exists, we can pass the request down the chain for other middleware to use.  What we're not seeing here is the javascript code that initially triggers the chain and links the pieces together.
+					</p>
+				</section>
+
+
+				<section>
+					<h2>ASP.Net OWIN</h2>
+					<p>
+						There are several ways to create OWIN middleware, but it lets you create a method that takes in an <u>IDictionary&lt;string, object&gt;</u> object.  This object contains properties about the HTTP request and response.  ASP.Net OWIN also exposes a next method to continue the chain.
+					</p>
+				</section>
+
+				<section>
+					<h2>OWIN Example</h2>
+					<pre>
+						<code class="hljs cs">
+public AppFunc SomeMiddleware(AppFunc next)
+{
+    // Create and AppFunc using a Lambda expression:
+    AppFunc appFunc = async (IDictionary&lt;string, object&gt; environment) =&gt;
+    {
+        // Do some processing...
+
+        // Invoke and await the next middleware component:
+        await next.Invoke(environment);
+    };
+    return appFunc;
+}
+						</code>
+					</pre>
+				</section>
+
+				<section>
+					<h2>Other considerations</h2>
+					<ul>
+						<li>The chain should happen in succession, and not in parallel</li>
+						<li>There is the possibility of the command object not being processed - you may need to code up a "catch-all" processing object at the end of the chain</li>
+						<li>In some cases, using the Chain of Responsibility pattern can break the Single Responsibility Pattern (each class should have a single responsibility and be encapsulated)</li>
+						<li>It's a somewhat old pattern that may not be as relevant as it once was, at least in it's original form.</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>Questions?</h2>
+					<p>too bad we're out of time</p>
+				</section>
+			</div>
+
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+
+			// Full list of configuration options available at:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				width: '90%',
+
+				transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+				// Optional reveal.js plugins
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, condition: function() { return !!document.querySelector( 'pre code' ); }, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true },
+					{ src: 'plugin/notes/notes.js', async: true }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>
