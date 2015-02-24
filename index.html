@@ -172,7 +172,7 @@ var response = processor1.process(file);
 					<p>It's mostly about decoupling code</p>
 					<ul>
 						<li>You may want to decouple the starting code from the processing objects as much as possible</li>
-						<li>You may want to give control of continuing the chain up to the processing objects</li>
+						<li>You may want to give control of continuing the chain to the processing objects</li>
 						<li>The code starting the chain may not know about all of the parsers; might be a single entry point to a third party assembly implementing the pattern.</li>
 					</ul>
 				</section>
@@ -189,9 +189,9 @@ var response = processor1.process(file);
 							<dt>req</dt>
 							<dd>HTTP Request object (includes querystring, POST params, etc.)</dd>
 							<dt>res</dt>
-							<dd>HTTP Response object (initially blank, but will contain respons status code, response HTML, etc.)</dd>
+							<dd>HTTP Response object (initially blank, but will contain response status code, response HTML, etc.)</dd>
 							<dt>next</dt>
-							<dd>A method that lets the middleware method continue to the next middleware method</dd>
+							<dd>A method that lets this middleware method continue the chain to the next middleware method</dd>
 						</dl>
 					</p>
 				</section>
