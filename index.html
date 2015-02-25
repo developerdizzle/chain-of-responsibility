@@ -157,9 +157,9 @@ var response = processor1.process(file);
 						<ol>
 							<li>We setup the chain, and link together all the processing objects.</li>
 							<li>Then we start the chain, passing in the file.</li>
-							<li>It runs through the code in the first processor (CsvParser)
+							<li>It runs through the code in the first processor (TabParser)
 								<ol>
-									<li>if CsvParser determines it can process the file, it does so and returns a response.</li>
+									<li>if TabParser determines it can process the file, it does so and returns a response.</li>
 									<li>If not, it sends the file to the nextProcessor, and continues down the chain.</li>
 								</ol>
 							</li>
@@ -169,7 +169,7 @@ var response = processor1.process(file);
 
 				<section>
 					<h2>Okay, why not just create an array of parsers and loop through them?</h2>
-					<p>It's mostly about decoupling code</p>
+					<p>It's mostly about decoupling code.  There are better examples than mine.</p>
 					<ul>
 						<li>You may want to decouple the starting code from the processing objects as much as possible</li>
 						<li>You may want to give control of continuing the chain to the processing objects</li>
@@ -279,7 +279,7 @@ public AppFunc SomeMiddleware(AppFunc next)
 					<ul>
 						<li>The chain should happen in succession, and not in parallel</li>
 						<li>There is the possibility of the command object not being processed - you may need to code up a "catch-all" processing object at the end of the chain</li>
-						<li>In some cases, using the Chain of Responsibility pattern can break the Single Responsibility Pattern (each class should have a single responsibility and be encapsulated)</li>
+						<li>In some cases, using the Chain of Responsibility pattern can break the Single Responsibility Principle (each class should have a single responsibility and be encapsulated)</li>
 						<li>It's a somewhat old pattern that may not be as relevant as it once was, at least in it's original form.</li>
 					</ul>
 				</section>
